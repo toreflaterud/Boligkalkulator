@@ -1493,14 +1493,16 @@ function buildCmpTable(mA, mB, mC, inp) {
   const sum = arr => arr.slice(0,n).reduce((s,v)=>s+v,0);
   addSection(`Akkumulert til år ${n}`);
   addRow('Sum renter', [sum(mA.aar.hun_renter),sum(mA.aar.han_renter), sum(mB.aar.hun_renter),sum(mB.aar.han_renter), sum(mC.aar.hun_renter),sum(mC.aar.han_renter)]);
-  addRow('Sum avdrag', [sum(mA.aar.hun_avdrag),sum(mA.aar.han_avdrag), sum(mB.aar.hun_avdrag),sum(mB.aar.han_avdrag), sum(mC.aar.hun_avdrag),sum(mC.aar.han_avdrag)]);
+  addRow('Sum avdrag (ordinært)', [sum(mA.aar.hun_avdrag),sum(mA.aar.han_avdrag), sum(mB.aar.hun_avdrag),sum(mB.aar.han_avdrag), sum(mC.aar.hun_avdrag),sum(mC.aar.han_avdrag)]);
+  addRow('Sum ekstra innbetalt', [sum(mA.aar.hun_ekstra),sum(mA.aar.han_ekstra), sum(mB.aar.hun_ekstra),sum(mB.aar.han_ekstra), sum(mC.aar.hun_ekstra),sum(mC.aar.han_ekstra)]);
   addRow('Restgjeld', [mA.salg.restgjeld_hun,mA.salg.restgjeld_han, mB.salg.restgjeld_hun,mB.salg.restgjeld_han, mC.salg.restgjeld_hun,mC.salg.restgjeld_han]);
 
   addSection(`Sluttoppgjør år ${n}`);
-  addRow('Totalt utbetalt', [mA.salg.hun_totalt,mA.salg.han_totalt, mB.salg.hun_totalt,mB.salg.han_totalt, mC.salg.hun_totalt,mC.salg.han_totalt]);
   addRow('EK tilbake', [mA.salg.hun_ek_tilbake,mA.salg.han_ek_tilbake, mB.salg.hun_ek_tilbake,mB.salg.han_ek_tilbake, mC.salg.hun_ek_tilbake,mC.salg.han_ek_tilbake]);
-  addRow('Avdrag tilbake', [mA.salg.hun_avdrag_betalt,mA.salg.han_avdrag_betalt, mB.salg.hun_avdrag_betalt,mB.salg.han_avdrag_betalt, mC.salg.hun_avdrag_betalt,mC.salg.han_avdrag_betalt]);
+  addRow('Avdrag tilbake (ordinært)', [mA.salg.hun_avdrag_betalt,mA.salg.han_avdrag_betalt, mB.salg.hun_avdrag_betalt,mB.salg.han_avdrag_betalt, mC.salg.hun_avdrag_betalt,mC.salg.han_avdrag_betalt]);
+  addRow('Ekstra innbetalt tilbake', [mA.salg.hun_ekstra_betalt,mA.salg.han_ekstra_betalt, mB.salg.hun_ekstra_betalt,mB.salg.han_ekstra_betalt, mC.salg.hun_ekstra_betalt,mC.salg.han_ekstra_betalt]);
   addRow('Verdistigning (kr)', [mA.salg.hun_verdistigning,mA.salg.han_verdistigning, mB.salg.hun_verdistigning,mB.salg.han_verdistigning, mC.salg.hun_verdistigning,mC.salg.han_verdistigning]);
+  addRow('Totalt utbetalt', [mA.salg.hun_totalt,mA.salg.han_totalt, mB.salg.hun_totalt,mB.salg.han_totalt, mC.salg.hun_totalt,mC.salg.han_totalt]);
   addRow('Avkastning på EK (%)', [mA.salg.hun_ek_avkastning_pst,mA.salg.han_ek_avkastning_pst, mB.salg.hun_ek_avkastning_pst,mB.salg.han_ek_avkastning_pst, mC.salg.hun_ek_avkastning_pst,mC.salg.han_ek_avkastning_pst], true, true);
 }
 
