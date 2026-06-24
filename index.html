@@ -622,15 +622,15 @@ input[type=range].purple::-webkit-slider-thumb { background: var(--purple);box-s
       <div class="ctrl-section-hdr">Egenkapital</div>
       <div class="ctrl-body">
         <div class="ctrl-row">
-          <div class="ctrl-label"><span>EK – Hun</span><span id="lbl-ek-hun">400 000 kr</span></div>
-          <input type="range" class="rose" id="s-ek-hun" min="0" max="5000000" step="10000" value="400000" data-key="ek_hun" data-unit="kr"/>
+          <div class="ctrl-label"><span>EK – Person 1</span><span id="lbl-ek-hun">300 000 kr</span></div>
+          <input type="range" class="rose" id="s-ek-hun" min="0" max="5000000" step="10000" value="300000" data-key="ek_hun" data-unit="kr"/>
         </div>
         <div class="ctrl-row">
-          <div class="ctrl-label"><span>EK – Han</span><span id="lbl-ek-han">100 000 kr</span></div>
-          <input type="range" class="blue" id="s-ek-han" min="0" max="5000000" step="10000" value="100000" data-key="ek_han" data-unit="kr"/>
+          <div class="ctrl-label"><span>EK – Person 2</span><span id="lbl-ek-han">200 000 kr</span></div>
+          <input type="range" class="blue" id="s-ek-han" min="0" max="5000000" step="10000" value="200000" data-key="ek_han" data-unit="kr"/>
         </div>
         <div style="font-size:.7rem;color:var(--muted);line-height:1.5" id="ek-andel-info">
-          EK-fordeling: hun 80 % / han 20 %
+          EK-fordeling: Person 1 60 % / Person 2 40 %
         </div>
       </div>
     </div>
@@ -659,7 +659,7 @@ input[type=range].purple::-webkit-slider-thumb { background: var(--purple);box-s
           <input type="range" class="purple" id="s-ekstra" min="0" max="20000" step="500" value="2000" data-key="ekstra" data-unit="kr"/>
         </div>
         <div style="font-size:.7rem;color:var(--muted);line-height:1.5;margin-top:-2px" id="ekstra-info">
-          Han betaler dette ekstra/mnd til EK-gapet er lukket.
+          Personen med minst EK betaler dette ekstra/mnd til EK-gapet er lukket.
         </div>
       </div>
     </div>
@@ -669,7 +669,7 @@ input[type=range].purple::-webkit-slider-thumb { background: var(--purple);box-s
       <div class="ctrl-section-hdr">Modell B – eierandel</div>
       <div class="ctrl-body">
         <div class="ctrl-row">
-          <div class="ctrl-label"><span>Hennes andel</span><span id="lbl-andel">50.0 %</span></div>
+          <div class="ctrl-label"><span>Person 1 sin andel</span><span id="lbl-andel">50.0 %</span></div>
           <input type="range" class="purple" id="s-andel" min="10" max="90" step="1" value="50" data-key="andel" data-unit="%"/>
         </div>
         <div style="font-size:.7rem;color:var(--muted);line-height:1.5;margin-top:-4px">
@@ -733,7 +733,7 @@ input[type=range].purple::-webkit-slider-thumb { background: var(--purple);box-s
         <div style="font-size:.76rem;color:var(--muted);line-height:1.6;margin-top:8px;padding:12px 14px;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border2)">
           Alle tre modeller behandler nå nedbetalte avdrag rent (hver får sine egne avdrag tilbake).
           Forskjellen ligger kun i hvordan <b>verdistigningen</b> fordeles.
-          <b style="color:var(--green)">Modell C</b> gir hun og han <b>nøyaktig lik prosentvis avkastning</b>
+          <b style="color:var(--green)">Modell C</b> gir Person 1 og Person 2 <b>nøyaktig lik prosentvis avkastning</b>
           på egenkapitalen, slik at den som la inn mest EK også får mest gevinst i kroner.
         </div>
       </div>
@@ -828,8 +828,8 @@ input[type=range].purple::-webkit-slider-thumb { background: var(--purple);box-s
             <div class="diff-bar-wrap">
               <div class="diff-label">Fordeling av totalt utbetalt</div>
               <div class="diff-bar" id="diffbar-a">
-                <div class="diff-bar-hun" id="diffbar-a-hun" style="width:50%">Hun 50%</div>
-                <div class="diff-bar-han" id="diffbar-a-han">Han 50%</div>
+                <div class="diff-bar-hun" id="diffbar-a-hun" style="width:50%">P1 50%</div>
+                <div class="diff-bar-han" id="diffbar-a-han">P2 50%</div>
               </div>
             </div>
           </div>
@@ -842,8 +842,8 @@ input[type=range].purple::-webkit-slider-thumb { background: var(--purple);box-s
             <div class="diff-bar-wrap">
               <div class="diff-label">Fordeling av totalt utbetalt</div>
               <div class="diff-bar" id="diffbar-b">
-                <div class="diff-bar-hun" id="diffbar-b-hun" style="width:50%">Hun 50%</div>
-                <div class="diff-bar-han" id="diffbar-b-han">Han 50%</div>
+                <div class="diff-bar-hun" id="diffbar-b-hun" style="width:50%">P1 50%</div>
+                <div class="diff-bar-han" id="diffbar-b-han">P2 50%</div>
               </div>
             </div>
           </div>
@@ -856,8 +856,8 @@ input[type=range].purple::-webkit-slider-thumb { background: var(--purple);box-s
             <div class="diff-bar-wrap">
               <div class="diff-label">Fordeling av totalt utbetalt</div>
               <div class="diff-bar" id="diffbar-c">
-                <div class="diff-bar-hun" id="diffbar-c-hun" style="width:50%">Hun 50%</div>
-                <div class="diff-bar-han" id="diffbar-c-han">Han 50%</div>
+                <div class="diff-bar-hun" id="diffbar-c-hun" style="width:50%">P1 50%</div>
+                <div class="diff-bar-han" id="diffbar-c-han">P2 50%</div>
               </div>
             </div>
           </div>
@@ -876,9 +876,9 @@ input[type=range].purple::-webkit-slider-thumb { background: var(--purple);box-s
           <thead>
             <tr id="cmp-head">
               <th style="width:28%">Nøkkeltall</th>
-              <th class="col-a">Hun · A</th><th class="col-a">Han · A</th>
-              <th class="col-b">Hun · B</th><th class="col-b">Han · B</th>
-              <th class="col-c">Hun · C</th><th class="col-c">Han · C</th>
+              <th class="col-a">P1 · A</th><th class="col-a">P2 · A</th>
+              <th class="col-b">P1 · B</th><th class="col-b">P2 · B</th>
+              <th class="col-c">P1 · C</th><th class="col-c">P2 · C</th>
             </tr>
           </thead>
           <tbody id="cmp-tbody"></tbody>
@@ -894,7 +894,7 @@ input[type=range].purple::-webkit-slider-thumb { background: var(--purple);box-s
   'use strict';
   function annuitet(laan, r, n) { return r === 0 ? laan / n : laan * r / (1 - Math.pow(1 + r, -n)); }
   function deriveInputs(raw) {
-    const inp = Object.assign({ boligpris:4000000, ek_hun:400000, ek_han:100000, rente_arlig:0.055,
+    const inp = Object.assign({ boligpris:4000000, ek_hun:300000, ek_han:200000, rente_arlig:0.055,
       nedbetalingstid_ar:25, salgsaar:5, salgspris:4500000, salgskostnad_pst:0.02,
       modell_b_eierandel_hun:0.50, ekstra_innbetaling_mnd:2000, modell_c_metode:1 }, raw);
     inp.totalt_laan = inp.boligpris - inp.ek_hun - inp.ek_han;
@@ -1039,8 +1039,8 @@ input[type=range].purple::-webkit-slider-thumb { background: var(--purple);box-s
    ============================================================ */
 let state = {
   boligpris: 4000000,
-  ek_hun: 400000,
-  ek_han: 100000,
+  ek_hun: 300000,
+  ek_han: 200000,
   rente_arlig: 0.055,
   nedbetalingstid_ar: 25,
   salgsaar: 5,
@@ -1128,7 +1128,7 @@ function setLbl(id, txt) { const e=document.getElementById(id); if(e) e.textCont
 function updateEkInfo() {
   const tot = state.ek_hun + state.ek_han;
   if (tot <= 0) { setLbl('ek-andel-info','EK-fordeling: ingen EK'); return; }
-  setLbl('ek-andel-info', `EK-fordeling: hun ${Math.round(state.ek_hun/tot*100)} % / han ${Math.round(state.ek_han/tot*100)} %`);
+  setLbl('ek-andel-info', `EK-fordeling: Person 1 ${Math.round(state.ek_hun/tot*100)} % / Person 2 ${Math.round(state.ek_han/tot*100)} %`);
 }
 
 /* ============================================================
@@ -1231,8 +1231,8 @@ function render(d) {
   setLbl('kpi-laan', fmt(inp.totalt_laan));
   setLbl('kpi-laan-sub', fmtPct((inp.ek_hun+inp.ek_han)/inp.boligpris) + ' egenkapitalandel');
   setLbl('kpi-betaling-a', fmtKr(mA.hun.betaling));
-  setLbl('kpi-betaling-bc-hun', 'Hun ' + fmtKr(mB.hun.betaling));
-  setLbl('kpi-betaling-bc-han-sub', 'Han ' + fmtKr(mB.han.betaling));
+  setLbl('kpi-betaling-bc-hun', 'P1 ' + fmtKr(mB.hun.betaling));
+  setLbl('kpi-betaling-bc-han-sub', 'P2 ' + fmtKr(mB.han.betaling));
   setLbl('kpi-gevinst', fmt(mC.salg.netto_verdistigning));
   setLbl('kpi-gevinst-sub', 'Salgspris − kjøpspris − salgskostnad');
 
@@ -1242,7 +1242,7 @@ function render(d) {
   // Ekstra-info: hvor lang tid å lukke gapet
   if (inp.ek_gap > 0 && inp.ekstra_innbetaling_mnd > 0) {
     const aar = (inp.ekstra_mnd_antall / 12);
-    setLbl('ekstra-info', `Lukker EK-gap på ${fmtKr(inp.ek_gap)} på ${inp.ekstra_mnd_antall} mnd (${aar.toFixed(1)} år). Han betaler dette ekstra til gapet er lukket.`);
+    setLbl('ekstra-info', `Lukker EK-gap på ${fmtKr(inp.ek_gap)} på ${inp.ekstra_mnd_antall} mnd (${aar.toFixed(1)} år). Personen med minst EK betaler dette ekstra til gapet er lukket.`);
   } else if (inp.ek_gap <= 0) {
     setLbl('ekstra-info', 'Likt EK-innskudd – ingen ekstra innbetaling nødvendig.');
   } else {
@@ -1291,13 +1291,13 @@ function buildEkAvkChart(mA, mB, mC, showA, showB, showC) {
   ec.setOption({
     backgroundColor:'transparent',
     tooltip:{ trigger:'axis', axisPointer:{type:'shadow'}, backgroundColor:'#1e2530', borderColor:'#30363d', textStyle:{color:'#e6edf3',fontFamily:'DM Mono',fontSize:11}, formatter:p=>{ let s=`<b>${p[0].name}</b><br>`; p.forEach(i=>{ s+=`<span style="color:${i.color}">●</span> ${i.seriesName}: ${i.value.toFixed(1).replace('.',',')} %<br>`; }); return s; } },
-    legend:{ data:['Hun','Han'], textStyle:{color:'#8b949e',fontSize:11,fontFamily:'DM Mono'}, top:0 },
+    legend:{ data:['Person 1','Person 2'], textStyle:{color:'#8b949e',fontSize:11,fontFamily:'DM Mono'}, top:0 },
     grid:{ top:34, left:60, right:20, bottom:24 },
     xAxis:{ type:'category', data:cats, axisLine:{lineStyle:{color:'#30363d'}}, axisLabel:{color:'#8b949e',fontFamily:'DM Mono',fontSize:11} },
     yAxis:{ type:'value', name:'% avk. på EK', nameTextStyle:{color:'#8b949e',fontSize:10}, axisLine:{show:false}, axisTick:{show:false}, splitLine:{lineStyle:{color:'#21262d'}}, axisLabel:{color:'#8b949e',fontFamily:'DM Mono',fontSize:10, formatter:v=>v+'%'} },
     series:[
-      { name:'Hun', type:'bar', data:hunData, itemStyle:{color:COL.hun}, barMaxWidth:40, label:{show:true,position:'top',formatter:p=>p.value.toFixed(0)+'%',color:COL.hun,fontFamily:'DM Mono',fontSize:10} },
-      { name:'Han', type:'bar', data:hanData, itemStyle:{color:COL.han}, barMaxWidth:40, label:{show:true,position:'top',formatter:p=>p.value.toFixed(0)+'%',color:COL.han,fontFamily:'DM Mono',fontSize:10} },
+      { name:'Person 1', type:'bar', data:hunData, itemStyle:{color:COL.hun}, barMaxWidth:40, label:{show:true,position:'top',formatter:p=>p.value.toFixed(0)+'%',color:COL.hun,fontFamily:'DM Mono',fontSize:10} },
+      { name:'Person 2', type:'bar', data:hanData, itemStyle:{color:COL.han}, barMaxWidth:40, label:{show:true,position:'top',formatter:p=>p.value.toFixed(0)+'%',color:COL.han,fontFamily:'DM Mono',fontSize:10} },
     ],
   });
 }
@@ -1311,8 +1311,8 @@ function buildDonut(id, title, subtitle, color, salg) {
     tooltip:{ trigger:'item', backgroundColor:'#1e2530', borderColor:'#30363d', textStyle:{color:'#e6edf3',fontFamily:'DM Mono',fontSize:11}, formatter:p=>`${p.name}<br>${p.value.toFixed(1).replace('.',',')} %<br>${fmtKr(p.data.kr)}` },
     series:[{ type:'pie', radius:['42%','68%'], center:['50%','60%'],
       data:[
-        {value:+(salg.hun_andel*100).toFixed(1), name:'Hun', kr:salg.hun_verdistigning, itemStyle:{color:COL.hun}},
-        {value:+(salg.han_andel*100).toFixed(1), name:'Han', kr:salg.han_verdistigning, itemStyle:{color:COL.han}},
+        {value:+(salg.hun_andel*100).toFixed(1), name:'Person 1', kr:salg.hun_verdistigning, itemStyle:{color:COL.hun}},
+        {value:+(salg.han_andel*100).toFixed(1), name:'Person 2', kr:salg.han_verdistigning, itemStyle:{color:COL.han}},
       ],
       label:{ formatter:p=>p.name+'\n'+p.value.toFixed(0)+'%', fontSize:11, fontFamily:'DM Mono', color:'#e6edf3' },
       emphasis:{ scale:true, scaleSize:5 },
@@ -1330,7 +1330,7 @@ function buildUtbetaling(sA, sB, sC, showA, showB, showC) {
   if (showC) groups.push({key:'C', s:sC});
 
   const cats = [];
-  groups.forEach(g => { cats.push('Hun · '+g.key); cats.push('Han · '+g.key); });
+  groups.forEach(g => { cats.push('P1 · '+g.key); cats.push('P2 · '+g.key); });
 
   const ekData = [], avdragData = [], ekstraData = [], vstignData = [];
   groups.forEach(g => {
@@ -1361,12 +1361,12 @@ function buildRestgjeld(mA, mB, showA, showBC) {
   const labels = mA.aar.labels;
   const series = [];
   if (showA) {
-    series.push({ name:'Hun · lån A', type:'line', data:mA.aar.hun_restgjeld, smooth:0.3, showSymbol:false, lineStyle:{color:COL.a.hun,width:2}, itemStyle:{color:COL.a.hun} });
-    series.push({ name:'Han · lån A', type:'line', data:mA.aar.han_restgjeld, smooth:0.3, showSymbol:false, lineStyle:{color:COL.a.main,width:2}, itemStyle:{color:COL.a.main} });
+    series.push({ name:'P1 · lån A', type:'line', data:mA.aar.hun_restgjeld, smooth:0.3, showSymbol:false, lineStyle:{color:COL.a.hun,width:2}, itemStyle:{color:COL.a.hun} });
+    series.push({ name:'P2 · lån A', type:'line', data:mA.aar.han_restgjeld, smooth:0.3, showSymbol:false, lineStyle:{color:COL.a.main,width:2}, itemStyle:{color:COL.a.main} });
   }
   if (showBC) {
-    series.push({ name:'Hun · lån B/C', type:'line', data:mB.aar.hun_restgjeld, smooth:0.3, showSymbol:false, lineStyle:{color:COL.b.hun,width:2,type:'dashed'}, itemStyle:{color:COL.b.hun} });
-    series.push({ name:'Han · lån B/C', type:'line', data:mB.aar.han_restgjeld, smooth:0.3, showSymbol:false, lineStyle:{color:COL.b.han,width:2,type:'dashed'}, itemStyle:{color:COL.b.han} });
+    series.push({ name:'P1 · lån B/C', type:'line', data:mB.aar.hun_restgjeld, smooth:0.3, showSymbol:false, lineStyle:{color:COL.b.hun,width:2,type:'dashed'}, itemStyle:{color:COL.b.hun} });
+    series.push({ name:'P2 · lån B/C', type:'line', data:mB.aar.han_restgjeld, smooth:0.3, showSymbol:false, lineStyle:{color:COL.b.han,width:2,type:'dashed'}, itemStyle:{color:COL.b.han} });
   }
   ec.setOption({
     backgroundColor:'transparent',
@@ -1386,15 +1386,15 @@ function buildRenteChart(id, m, mainColor) {
   ec.setOption({
     backgroundColor:'transparent',
     tooltip:{ trigger:'axis', axisPointer:{type:'shadow'}, backgroundColor:'#1e2530', borderColor:'#30363d', textStyle:{color:'#e6edf3',fontFamily:'DM Mono',fontSize:11}, formatter:p=>{ let s=`<b>År ${p[0].name}</b><br>`; p.forEach(i=>{ s+=`<span style="color:${i.color}">●</span> ${i.seriesName}: ${Math.round(i.value).toLocaleString('nb-NO')} kr<br>`; }); return s; } },
-    legend:{ data:['Hun renter','Hun avdrag','Han renter','Han avdrag'], textStyle:{color:'#8b949e',fontSize:9,fontFamily:'DM Mono'}, bottom:0, icon:'roundRect' },
+    legend:{ data:['P1 renter','P1 avdrag','P2 renter','P2 avdrag'], textStyle:{color:'#8b949e',fontSize:9,fontFamily:'DM Mono'}, bottom:0, icon:'roundRect' },
     grid:{ top:10, left:60, right:10, bottom:50 },
     xAxis:{ type:'category', data:labels, axisLine:{lineStyle:{color:'#30363d'}}, axisLabel:{color:'#8b949e',fontFamily:'DM Mono',fontSize:9,rotate:30}, splitLine:{show:false} },
     yAxis:{ type:'value', axisLine:{show:false}, axisTick:{show:false}, splitLine:{lineStyle:{color:'#21262d'}}, axisLabel:{color:'#8b949e',fontFamily:'DM Mono',fontSize:9, formatter:krShort} },
     series:[
-      { name:'Hun renter', type:'bar', stack:'hun', data:m.aar.hun_renter, itemStyle:{color:COL.hun}, barMaxWidth:16 },
-      { name:'Hun avdrag', type:'bar', stack:'hun', data:m.aar.hun_avdrag, itemStyle:{color:'rgba(255,107,138,.4)'} },
-      { name:'Han renter', type:'bar', stack:'han', data:m.aar.han_renter, itemStyle:{color:COL.han}, barMaxWidth:16 },
-      { name:'Han avdrag', type:'bar', stack:'han', data:m.aar.han_avdrag, itemStyle:{color:'rgba(88,166,255,.4)'} },
+      { name:'P1 renter', type:'bar', stack:'hun', data:m.aar.hun_renter, itemStyle:{color:COL.hun}, barMaxWidth:16 },
+      { name:'P1 avdrag', type:'bar', stack:'hun', data:m.aar.hun_avdrag, itemStyle:{color:'rgba(255,107,138,.4)'} },
+      { name:'P2 renter', type:'bar', stack:'han', data:m.aar.han_renter, itemStyle:{color:COL.han}, barMaxWidth:16 },
+      { name:'P2 avdrag', type:'bar', stack:'han', data:m.aar.han_avdrag, itemStyle:{color:'rgba(88,166,255,.4)'} },
     ],
   });
 }
@@ -1405,12 +1405,12 @@ function buildAkkRente(mA, mB, showA, showBC) {
   const labels = mA.aar.labels;
   const series = [];
   if (showA) {
-    series.push({ name:'Hun · lån A', type:'line', data:mA.aar.hun_renter_akk, smooth:0.3, showSymbol:false, lineStyle:{color:COL.a.hun,width:2} });
-    series.push({ name:'Han · lån A', type:'line', data:mA.aar.han_renter_akk, smooth:0.3, showSymbol:false, lineStyle:{color:COL.a.main,width:2} });
+    series.push({ name:'P1 · lån A', type:'line', data:mA.aar.hun_renter_akk, smooth:0.3, showSymbol:false, lineStyle:{color:COL.a.hun,width:2} });
+    series.push({ name:'P2 · lån A', type:'line', data:mA.aar.han_renter_akk, smooth:0.3, showSymbol:false, lineStyle:{color:COL.a.main,width:2} });
   }
   if (showBC) {
-    series.push({ name:'Hun · lån B/C', type:'line', data:mB.aar.hun_renter_akk, smooth:0.3, showSymbol:false, lineStyle:{color:COL.b.hun,width:2,type:'dashed'} });
-    series.push({ name:'Han · lån B/C', type:'line', data:mB.aar.han_renter_akk, smooth:0.3, showSymbol:false, lineStyle:{color:COL.b.han,width:2,type:'dashed'} });
+    series.push({ name:'P1 · lån B/C', type:'line', data:mB.aar.hun_renter_akk, smooth:0.3, showSymbol:false, lineStyle:{color:COL.b.hun,width:2,type:'dashed'} });
+    series.push({ name:'P2 · lån B/C', type:'line', data:mB.aar.han_renter_akk, smooth:0.3, showSymbol:false, lineStyle:{color:COL.b.han,width:2,type:'dashed'} });
   }
   ec.setOption({
     backgroundColor:'transparent',
@@ -1428,16 +1428,16 @@ function buildSettlementTable(tbodyId, s) {
   const tbody = document.getElementById(tbodyId); if (!tbody) return;
   const rows = [
     { label:'Netto salgssum', val:fmtKr(s.netto_salgssum), cls:'' },
-    { label:'(-) Restgjeld hun', val:fmtKr(-s.restgjeld_hun), cls:'' },
-    { label:'(-) Restgjeld han', val:fmtKr(-s.restgjeld_han), cls:'' },
+    { label:'(-) Restgjeld P1', val:fmtKr(-s.restgjeld_hun), cls:'' },
+    { label:'(-) Restgjeld P2', val:fmtKr(-s.restgjeld_han), cls:'' },
     { label:'Beløp til fordeling', val:fmtKr(s.beloep_til_fordeling), cls:'row-total' },
-    { label:'Hun – får totalt', val:fmtKr(s.hun_totalt), cls:'row-total' },
+    { label:'Person 1 – får totalt', val:fmtKr(s.hun_totalt), cls:'row-total' },
     { label:'  ↳ EK tilbake', val:fmtKr(s.hun_ek_tilbake), cls:'row-gevinst' },
     { label:'  ↳ Egne avdrag', val:fmtKr(s.hun_avdrag_betalt), cls:'row-gevinst' },
   ];
   if (s.hun_ekstra_betalt > 0.5) rows.push({ label:'  ↳ Ekstra innbetalt', val:fmtKr(s.hun_ekstra_betalt), cls:'row-gevinst' });
   rows.push({ label:`  ↳ Verdistigning (${fmtPct(s.hun_andel)})`, val:fmtKr(s.hun_verdistigning), cls:'row-gevinst' });
-  rows.push({ label:'Han – får totalt', val:fmtKr(s.han_totalt), cls:'row-total' });
+  rows.push({ label:'Person 2 – får totalt', val:fmtKr(s.han_totalt), cls:'row-total' });
   rows.push({ label:'  ↳ EK tilbake', val:fmtKr(s.han_ek_tilbake), cls:'row-gevinst' });
   rows.push({ label:'  ↳ Egne avdrag', val:fmtKr(s.han_avdrag_betalt), cls:'row-gevinst' });
   if (s.han_ekstra_betalt > 0.5) rows.push({ label:'  ↳ Ekstra innbetalt', val:fmtKr(s.han_ekstra_betalt), cls:'row-gevinst' });
@@ -1459,8 +1459,8 @@ function updateDiffBar(model, s) {
   const hanPct = (s.han_totalt/tot*100).toFixed(1);
   const h = document.getElementById(`diffbar-${model}-hun`);
   const a = document.getElementById(`diffbar-${model}-han`);
-  if (h) { h.style.width = hunPct+'%'; h.textContent = `Hun ${hunPct}%`; }
-  if (a) { a.textContent = `Han ${hanPct}%`; }
+  if (h) { h.style.width = hunPct+'%'; h.textContent = `P1 ${hunPct}%`; }
+  if (a) { a.textContent = `P2 ${hanPct}%`; }
 }
 
 /* ---------- Sammenligningstabell ---------- */
