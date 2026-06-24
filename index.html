@@ -650,6 +650,20 @@ input[type=range].purple::-webkit-slider-thumb { background: var(--purple);box-s
       </div>
     </div>
 
+    <!-- Ekstra innbetaling -->
+    <div class="ctrl-section">
+      <div class="ctrl-section-hdr">Ekstra innbetaling (lukke EK-gap)</div>
+      <div class="ctrl-body">
+        <div class="ctrl-row">
+          <div class="ctrl-label"><span>Ekstra pr. mnd</span><span id="lbl-ekstra">2 000 kr</span></div>
+          <input type="range" class="purple" id="s-ekstra" min="0" max="20000" step="500" value="2000" data-key="ekstra" data-unit="kr"/>
+        </div>
+        <div style="font-size:.7rem;color:var(--muted);line-height:1.5;margin-top:-2px" id="ekstra-info">
+          Han betaler dette ekstra/mnd til EK-gapet er lukket.
+        </div>
+      </div>
+    </div>
+
     <!-- Modell B -->
     <div class="ctrl-section">
       <div class="ctrl-section-hdr">Modell B – eierandel</div>
@@ -660,6 +674,21 @@ input[type=range].purple::-webkit-slider-thumb { background: var(--purple);box-s
         </div>
         <div style="font-size:.7rem;color:var(--muted);line-height:1.5;margin-top:-4px">
           Justerer hvordan verdistigning deles i B-modellen.
+        </div>
+      </div>
+    </div>
+
+    <!-- Modell C – metode -->
+    <div class="ctrl-section">
+      <div class="ctrl-section-hdr">Modell C – fordelingsmetode</div>
+      <div class="ctrl-body">
+        <div class="model-toggle" style="grid-template-columns:1fr 1fr">
+          <button class="model-btn active-c" data-cmetode="1" id="btn-cm1">Ved salg</button>
+          <button class="model-btn" data-cmetode="2" id="btn-cm2">Gjennomsnitt</button>
+        </div>
+        <div style="font-size:.7rem;color:var(--muted);line-height:1.5">
+          <b>Ved salg:</b> EK-andel på salgsdagen → lik %-avkastning.<br>
+          <b>Gjennomsnitt:</b> veier EK-andel over hele perioden → belønner tidlig innskudd.
         </div>
       </div>
     </div>
@@ -860,193 +889,146 @@ input[type=range].purple::-webkit-slider-thumb { background: var(--purple);box-s
   </main>
 </div>
 
-<script>/* ============================================================
-   calculator.js – portert fra calculator.py
-   Identisk finansiell beregningsmotor, kjører i nettleser.
-   ============================================================ */
+<script>/* calculator.js – portert fra calculator.py (med ekstrainnbetaling + C-metode 1/2) */
 (function (global) {
   'use strict';
-
-  function annuitet(laan, mndRente, terminer) {
-    if (mndRente === 0) return laan / terminer;
-    return laan * mndRente / (1 - Math.pow(1 + mndRente, -terminer));
-  }
-
+  function annuitet(laan, r, n) { return r === 0 ? laan / n : laan * r / (1 - Math.pow(1 + r, -n)); }
   function deriveInputs(raw) {
-    const inp = Object.assign({
-      boligpris: 4000000, ek_hun: 400000, ek_han: 100000,
-      rente_arlig: 0.055, nedbetalingstid_ar: 25, salgsaar: 5,
-      salgspris: 4500000, salgskostnad_pst: 0.02, modell_b_eierandel_hun: 0.50,
-    }, raw);
+    const inp = Object.assign({ boligpris:4000000, ek_hun:400000, ek_han:100000, rente_arlig:0.055,
+      nedbetalingstid_ar:25, salgsaar:5, salgspris:4500000, salgskostnad_pst:0.02,
+      modell_b_eierandel_hun:0.50, ekstra_innbetaling_mnd:2000, modell_c_metode:1 }, raw);
     inp.totalt_laan = inp.boligpris - inp.ek_hun - inp.ek_han;
     inp.maanedlig_rente = inp.rente_arlig / 12;
     inp.antall_terminer = inp.nedbetalingstid_ar * 12;
     inp.salgskostnad_kr = inp.salgspris * inp.salgskostnad_pst;
+    inp.ek_gap = Math.max(0, inp.ek_hun - inp.ek_han);
     return inp;
   }
-
+  function settEkstra(inp, hun, han) {
+    const gap = inp.ek_gap;
+    if (inp.ekstra_innbetaling_mnd <= 0 || gap <= 0) return;
+    if (inp.ek_han <= inp.ek_hun) { han.ekstra_mnd = inp.ekstra_innbetaling_mnd; han.ekstra_tak = Math.min(gap, han.laan); }
+    else { hun.ekstra_mnd = inp.ekstra_innbetaling_mnd; hun.ekstra_tak = Math.min(inp.ek_han - inp.ek_hun, hun.laan); }
+  }
+  function lp(navn, ek, laan, eierandel, betaling) { return { navn, ek, laan, eierandel, betaling, ekstra_mnd:0, ekstra_tak:0 }; }
   function modellA(inp) {
-    const laanPer = inp.totalt_laan / 2;
-    const eierHun = (inp.ek_hun + laanPer) / inp.boligpris;
-    const eierHan = (inp.ek_han + laanPer) / inp.boligpris;
-    const bet = annuitet(laanPer, inp.maanedlig_rente, inp.antall_terminer);
-    return {
-      hun: { ek: inp.ek_hun, laan: laanPer, eierandel: eierHun, betaling: bet },
-      han: { ek: inp.ek_han, laan: laanPer, eierandel: eierHan, betaling: bet },
-    };
+    const lpr = inp.totalt_laan / 2, bet = annuitet(lpr, inp.maanedlig_rente, inp.antall_terminer);
+    const hun = lp('Hun', inp.ek_hun, lpr, (inp.ek_hun+lpr)/inp.boligpris, bet);
+    const han = lp('Han', inp.ek_han, lpr, (inp.ek_han+lpr)/inp.boligpris, bet);
+    settEkstra(inp, hun, han); return { hun, han };
   }
-
   function modellB(inp) {
-    const andelHun = inp.modell_b_eierandel_hun;
-    const andelHan = 1 - andelHun;
-    const laanHun = Math.max(0, andelHun * inp.boligpris - inp.ek_hun);
-    const laanHan = Math.max(0, andelHan * inp.boligpris - inp.ek_han);
-    return {
-      hun: { ek: inp.ek_hun, laan: laanHun, eierandel: andelHun, betaling: annuitet(laanHun, inp.maanedlig_rente, inp.antall_terminer) },
-      han: { ek: inp.ek_han, laan: laanHan, eierandel: andelHan, betaling: annuitet(laanHan, inp.maanedlig_rente, inp.antall_terminer) },
-    };
+    const aH = inp.modell_b_eierandel_hun, aA = 1 - aH;
+    const lH = Math.max(0, aH*inp.boligpris - inp.ek_hun), lA = Math.max(0, aA*inp.boligpris - inp.ek_han);
+    const hun = lp('Hun', inp.ek_hun, lH, aH, annuitet(lH, inp.maanedlig_rente, inp.antall_terminer));
+    const han = lp('Han', inp.ek_han, lA, aA, annuitet(lA, inp.maanedlig_rente, inp.antall_terminer));
+    settEkstra(inp, hun, han); return { hun, han };
   }
-
   function modellC(inp) {
-    const totalEk = inp.ek_hun + inp.ek_han;
-    const andelHun = totalEk <= 0 ? 0.5 : inp.ek_hun / totalEk;
-    const andelHan = 1 - andelHun;
-    const laanHun = Math.max(0, 0.5 * inp.boligpris - inp.ek_hun);
-    const laanHan = Math.max(0, 0.5 * inp.boligpris - inp.ek_han);
-    return {
-      hun: { ek: inp.ek_hun, laan: laanHun, eierandel: andelHun, betaling: annuitet(laanHun, inp.maanedlig_rente, inp.antall_terminer) },
-      han: { ek: inp.ek_han, laan: laanHan, eierandel: andelHan, betaling: annuitet(laanHan, inp.maanedlig_rente, inp.antall_terminer) },
-    };
+    const tot = inp.ek_hun + inp.ek_han, aH = tot <= 0 ? 0.5 : inp.ek_hun/tot;
+    const lH = Math.max(0, 0.5*inp.boligpris - inp.ek_hun), lA = Math.max(0, 0.5*inp.boligpris - inp.ek_han);
+    const hun = lp('Hun', inp.ek_hun, lH, aH, annuitet(lH, inp.maanedlig_rente, inp.antall_terminer));
+    const han = lp('Han', inp.ek_han, lA, 1-aH, annuitet(lA, inp.maanedlig_rente, inp.antall_terminer));
+    settEkstra(inp, hun, han); return { hun, han };
   }
-
-  function amortiser(laan, betaling, mndRente, terminer) {
-    const rader = [];
-    let restgjeld = laan;
-    for (let m = 1; m <= terminer; m++) {
-      const rente = restgjeld * mndRente;
-      const avdrag = betaling - rente;
-      restgjeld = Math.max(0, restgjeld - avdrag);
-      rader.push({ maaned: m, aar: Math.floor((m - 1) / 12) + 1, rente, avdrag, restgjeld });
+  function amortiser(laan, betaling, r, n, ekstraMnd, ekstraTak) {
+    ekstraMnd = ekstraMnd || 0; ekstraTak = ekstraTak || 0;
+    const rader = []; let restgjeld = laan, ekstraTotal = 0;
+    for (let m = 1; m <= n; m++) {
+      const rente = restgjeld * r; let avdrag = betaling - rente; let ekstra = 0;
+      if (ekstraMnd > 0 && ekstraTotal < ekstraTak - 1e-6) { ekstra = Math.min(ekstraMnd, ekstraTak - ekstraTotal); ekstraTotal += ekstra; }
+      let nd = avdrag + ekstra;
+      if (nd > restgjeld) { const o = nd - restgjeld; ekstra = Math.max(0, ekstra - o); avdrag = restgjeld - ekstra; }
+      restgjeld = Math.max(0, restgjeld - avdrag - ekstra);
+      rader.push({ maaned:m, aar:Math.floor((m-1)/12)+1, rente, avdrag, ekstra, restgjeld });
     }
     return rader;
   }
-
-  function arligOppsummering(rader) {
-    const map = {};
-    const order = [];
-    for (const r of rader) {
-      if (!(r.aar in map)) { map[r.aar] = { aar: r.aar, renter: 0, avdrag: 0, restgjeld: 0 }; order.push(r.aar); }
-      map[r.aar].renter += r.rente;
-      map[r.aar].avdrag += r.avdrag;
-      map[r.aar].restgjeld = r.restgjeld;
-    }
+  function arlig(rader) {
+    const map = {}, order = [];
+    for (const x of rader) { if (!(x.aar in map)) { map[x.aar] = {aar:x.aar,renter:0,avdrag:0,ekstra:0,restgjeld:0}; order.push(x.aar); }
+      map[x.aar].renter += x.rente; map[x.aar].avdrag += x.avdrag; map[x.aar].ekstra += x.ekstra; map[x.aar].restgjeld = x.restgjeld; }
     return order.map(a => map[a]);
   }
-
-  function restgjeldOgAvdrag(inp, params) {
-    const terminer = inp.salgsaar * 12;
-    const tab = amortiser(params.laan, params.betaling, inp.maanedlig_rente, terminer);
-    const restgjeld = tab.length ? tab[tab.length - 1].restgjeld : params.laan;
-    const avdrag = tab.reduce((s, r) => s + r.avdrag, 0);
-    return { restgjeld, avdrag };
+  function rae(inp, p) {
+    const n = inp.salgsaar * 12, tab = amortiser(p.laan, p.betaling, inp.maanedlig_rente, n, p.ekstra_mnd, p.ekstra_tak);
+    const restgjeld = tab.length ? tab[tab.length-1].restgjeld : p.laan;
+    let avdrag = 0, ekstra = 0; for (const x of tab) { avdrag += x.avdrag; ekstra += x.ekstra; }
+    return { restgjeld, avdrag, ekstra };
   }
-
-  /* Rein sluttoppgjørsmodell – avdrag behandles rent for alle modeller.
-     vstignAndelHun/Han = fordelingsnøkkel for verdistigning. */
-  function sluttoppgjor(inp, hun, han, vstignAndelHun, vstignAndelHan) {
-    const rH = restgjeldOgAvdrag(inp, hun);
-    const rA = restgjeldOgAvdrag(inp, han);
-    const netto = inp.salgspris - inp.salgskostnad_kr;
-    const beloep = netto - rH.restgjeld - rA.restgjeld;
-    const nettoVstign = inp.salgspris - inp.boligpris - inp.salgskostnad_kr;
-    const hunVstign = nettoVstign * vstignAndelHun;
-    const hanVstign = nettoVstign * vstignAndelHan;
-    const hunTot = hun.ek + rH.avdrag + hunVstign;
-    const hanTot = han.ek + rA.avdrag + hanVstign;
-    return {
-      netto_salgssum: netto,
-      restgjeld_hun: rH.restgjeld, restgjeld_han: rA.restgjeld,
-      beloep_til_fordeling: beloep,
-      hun_andel: vstignAndelHun, han_andel: vstignAndelHan,
-      hun_totalt: hunTot, han_totalt: hanTot,
-      hun_ek_tilbake: hun.ek, han_ek_tilbake: han.ek,
-      hun_gevinst: hunVstign, han_gevinst: hanVstign,
-      hun_avdrag_betalt: rH.avdrag, han_avdrag_betalt: rA.avdrag,
-      netto_verdistigning: nettoVstign,
-      hun_verdistigning: hunVstign, han_verdistigning: hanVstign,
-      hun_ek_avkastning_pst: hun.ek > 0 ? hunVstign / hun.ek : 0,
-      han_ek_avkastning_pst: han.ek > 0 ? hanVstign / han.ek : 0,
-    };
+  function snittEk(inp, hun, han) {
+    const n = inp.salgsaar * 12;
+    const tH = amortiser(hun.laan, hun.betaling, inp.maanedlig_rente, n, hun.ekstra_mnd, hun.ekstra_tak);
+    const tA = amortiser(han.laan, han.betaling, inp.maanedlig_rente, n, han.ekstra_mnd, han.ekstra_tak);
+    if (n === 0) { const t = hun.ek+han.ek; return t>0?[hun.ek/t,han.ek/t]:[0.5,0.5]; }
+    let s = 0, kH = 0, kA = 0, c = 0;
+    for (let i = 0; i < n; i++) { kH += tH[i].avdrag+tH[i].ekstra; kA += tA[i].avdrag+tA[i].ekstra;
+      const eH = hun.ek+kH, eA = han.ek+kA, t = eH+eA; if (t>0) { s += eH/t; c++; } }
+    if (c === 0) return [0.5,0.5]; const a = s/c; return [a, 1-a];
   }
-
-  function akkumuler(aarListe, felt) {
-    let tot = 0;
-    return aarListe.map(r => { tot += r[felt]; return Math.round(tot); });
+  function slutt(inp, hun, han, vH, vA) {
+    const rH = rae(inp, hun), rA = rae(inp, han);
+    const netto = inp.salgspris - inp.salgskostnad_kr, beloep = netto - rH.restgjeld - rA.restgjeld;
+    const nv = inp.salgspris - inp.boligpris - inp.salgskostnad_kr;
+    const hv = nv*vH, av = nv*vA;
+    const iH = hun.ek + rH.avdrag + rH.ekstra, iA = han.ek + rA.avdrag + rA.ekstra;
+    return { netto_salgssum:netto, restgjeld_hun:rH.restgjeld, restgjeld_han:rA.restgjeld,
+      beloep_til_fordeling:beloep, hun_andel:vH, han_andel:vA, hun_totalt:iH+hv, han_totalt:iA+av,
+      hun_ek_tilbake:hun.ek, han_ek_tilbake:han.ek, hun_gevinst:hv, han_gevinst:av,
+      hun_avdrag_betalt:rH.avdrag, han_avdrag_betalt:rA.avdrag, hun_ekstra_betalt:rH.ekstra, han_ekstra_betalt:rA.ekstra,
+      hun_ek_innskutt:iH, han_ek_innskutt:iA, netto_verdistigning:nv, hun_verdistigning:hv, han_verdistigning:av,
+      hun_ek_avkastning_pst: iH>0?hv/iH:0, han_ek_avkastning_pst: iA>0?av/iA:0 };
   }
-
-  function aarDict(aarLabels, aarHun, aarHan) {
-    return {
-      labels: aarLabels,
-      hun_renter: aarHun.map(r => Math.round(r.renter)),
-      hun_avdrag: aarHun.map(r => Math.round(r.avdrag)),
-      hun_restgjeld: aarHun.map(r => Math.round(r.restgjeld)),
-      han_renter: aarHan.map(r => Math.round(r.renter)),
-      han_avdrag: aarHan.map(r => Math.round(r.avdrag)),
-      han_restgjeld: aarHan.map(r => Math.round(r.restgjeld)),
-      hun_renter_akk: akkumuler(aarHun, 'renter'),
-      han_renter_akk: akkumuler(aarHan, 'renter'),
-      hun_avdrag_akk: akkumuler(aarHun, 'avdrag'),
-      han_avdrag_akk: akkumuler(aarHan, 'avdrag'),
-    };
+  function akk(liste, felt) { let t = 0; return liste.map(r => { t += r[felt]; return Math.round(t); }); }
+  function aarDict(labels, aH, aA) {
+    return { labels,
+      hun_renter:aH.map(r=>Math.round(r.renter)), hun_avdrag:aH.map(r=>Math.round(r.avdrag)),
+      hun_ekstra:aH.map(r=>Math.round(r.ekstra)), hun_restgjeld:aH.map(r=>Math.round(r.restgjeld)),
+      han_renter:aA.map(r=>Math.round(r.renter)), han_avdrag:aA.map(r=>Math.round(r.avdrag)),
+      han_ekstra:aA.map(r=>Math.round(r.ekstra)), han_restgjeld:aA.map(r=>Math.round(r.restgjeld)),
+      hun_renter_akk:akk(aH,'renter'), han_renter_akk:akk(aA,'renter'),
+      hun_avdrag_akk:akk(aH,'avdrag'), han_avdrag_akk:akk(aA,'avdrag') };
   }
-
-  function modellDict(hun, han, salg, aarHun, aarHan, aarLabels) {
-    return {
-      hun: { laan: hun.laan, eierandel: hun.eierandel, betaling: hun.betaling },
-      han: { laan: han.laan, eierandel: han.eierandel, betaling: han.betaling },
-      salg: salg,
-      aar: aarDict(aarLabels, aarHun, aarHan),
-    };
+  function md(hun, han, salg, aH, aA, labels) {
+    return { hun:{laan:hun.laan,eierandel:hun.eierandel,betaling:hun.betaling,ekstra_mnd:hun.ekstra_mnd},
+      han:{laan:han.laan,eierandel:han.eierandel,betaling:han.betaling,ekstra_mnd:han.ekstra_mnd},
+      salg, aar:aarDict(labels, aH, aA) };
   }
-
   function beregnAlt(raw) {
-    const inp = deriveInputs(raw);
-    const mA = modellA(inp), mB = modellB(inp), mC = modellC(inp);
-
-    const tabHunA = amortiser(mA.hun.laan, mA.hun.betaling, inp.maanedlig_rente, inp.antall_terminer);
-    const tabHanA = amortiser(mA.han.laan, mA.han.betaling, inp.maanedlig_rente, inp.antall_terminer);
-    const tabHunB = amortiser(mB.hun.laan, mB.hun.betaling, inp.maanedlig_rente, inp.antall_terminer);
-    const tabHanB = amortiser(mB.han.laan, mB.han.betaling, inp.maanedlig_rente, inp.antall_terminer);
-    const tabHunC = amortiser(mC.hun.laan, mC.hun.betaling, inp.maanedlig_rente, inp.antall_terminer);
-    const tabHanC = amortiser(mC.han.laan, mC.han.betaling, inp.maanedlig_rente, inp.antall_terminer);
-
-    const aHunA = arligOppsummering(tabHunA), aHanA = arligOppsummering(tabHanA);
-    const aHunB = arligOppsummering(tabHunB), aHanB = arligOppsummering(tabHanB);
-    const aHunC = arligOppsummering(tabHunC), aHanC = arligOppsummering(tabHanC);
-    const aarLabels = aHunA.map(r => String(r.aar));
-
-    const totalEk = inp.ek_hun + inp.ek_han;
-    const ekAndelHun = totalEk <= 0 ? 0.5 : inp.ek_hun / totalEk;
-    const ekAndelHan = 1 - ekAndelHun;
-
-    const salgA = sluttoppgjor(inp, mA.hun, mA.han, mA.hun.eierandel, mA.han.eierandel);
-    const salgB = sluttoppgjor(inp, mB.hun, mB.han, inp.modell_b_eierandel_hun, 1 - inp.modell_b_eierandel_hun);
-    const salgC = sluttoppgjor(inp, mC.hun, mC.han, ekAndelHun, ekAndelHan);
-
+    const inp = deriveInputs(raw), mA = modellA(inp), mB = modellB(inp), mC = modellC(inp);
+    const T = inp.antall_terminer, r = inp.maanedlig_rente;
+    const tHA = amortiser(mA.hun.laan,mA.hun.betaling,r,T,mA.hun.ekstra_mnd,mA.hun.ekstra_tak);
+    const tAA = amortiser(mA.han.laan,mA.han.betaling,r,T,mA.han.ekstra_mnd,mA.han.ekstra_tak);
+    const tHB = amortiser(mB.hun.laan,mB.hun.betaling,r,T,mB.hun.ekstra_mnd,mB.hun.ekstra_tak);
+    const tAB = amortiser(mB.han.laan,mB.han.betaling,r,T,mB.han.ekstra_mnd,mB.han.ekstra_tak);
+    const tHC = amortiser(mC.hun.laan,mC.hun.betaling,r,T,mC.hun.ekstra_mnd,mC.hun.ekstra_tak);
+    const tAC = amortiser(mC.han.laan,mC.han.betaling,r,T,mC.han.ekstra_mnd,mC.han.ekstra_tak);
+    const aHA=arlig(tHA),aAA=arlig(tAA),aHB=arlig(tHB),aAB=arlig(tAB),aHC=arlig(tHC),aAC=arlig(tAC);
+    const labels = aHA.map(x=>String(x.aar));
+    let cH, cA;
+    if (inp.modell_c_metode === 2) { [cH,cA] = snittEk(inp, mC.hun, mC.han); }
+    else { const rh=rae(inp,mC.hun), ra=rae(inp,mC.han);
+      const iH=mC.hun.ek+rh.avdrag+rh.ekstra, iA=mC.han.ek+ra.avdrag+ra.ekstra, t=iH+iA;
+      cH = t<=0?0.5:iH/t; cA = 1-cH; }
+    const sA = slutt(inp,mA.hun,mA.han,mA.hun.eierandel,mA.han.eierandel);
+    const sB = slutt(inp,mB.hun,mB.han,inp.modell_b_eierandel_hun,1-inp.modell_b_eierandel_hun);
+    const sC = slutt(inp,mC.hun,mC.han,cH,cA);
+    let emA = 0;
+    if (inp.ekstra_innbetaling_mnd > 0 && inp.ek_gap > 0)
+      emA = Math.ceil(Math.min(inp.ek_gap, Math.max(mC.hun.laan, mC.han.laan)) / inp.ekstra_innbetaling_mnd);
     return {
-      inputs: {
-        boligpris: inp.boligpris, ek_hun: inp.ek_hun, ek_han: inp.ek_han,
-        rente_arlig: inp.rente_arlig, nedbetalingstid_ar: inp.nedbetalingstid_ar,
-        salgsaar: inp.salgsaar, salgspris: inp.salgspris,
-        salgskostnad_pst: inp.salgskostnad_pst, totalt_laan: inp.totalt_laan,
-        ek_andel_hun: ekAndelHun, ek_andel_han: ekAndelHan,
-      },
-      modell_a: modellDict(mA.hun, mA.han, salgA, aHunA, aHanA, aarLabels),
-      modell_b: modellDict(mB.hun, mB.han, salgB, aHunB, aHanB, aarLabels),
-      modell_c: modellDict(mC.hun, mC.han, salgC, aHunC, aHanC, aarLabels),
+      inputs: { boligpris:inp.boligpris, ek_hun:inp.ek_hun, ek_han:inp.ek_han, rente_arlig:inp.rente_arlig,
+        nedbetalingstid_ar:inp.nedbetalingstid_ar, salgsaar:inp.salgsaar, salgspris:inp.salgspris,
+        salgskostnad_pst:inp.salgskostnad_pst, totalt_laan:inp.totalt_laan,
+        ek_andel_hun:(inp.ek_hun+inp.ek_han)>0?inp.ek_hun/(inp.ek_hun+inp.ek_han):0.5,
+        ek_andel_han:(inp.ek_hun+inp.ek_han)>0?inp.ek_han/(inp.ek_hun+inp.ek_han):0.5,
+        ekstra_innbetaling_mnd:inp.ekstra_innbetaling_mnd, ek_gap:inp.ek_gap,
+        ekstra_mnd_antall:emA, modell_c_metode:inp.modell_c_metode },
+      modell_a: md(mA.hun,mA.han,sA,aHA,aAA,labels),
+      modell_b: md(mB.hun,mB.han,sB,aHB,aAB,labels),
+      modell_c: md(mC.hun,mC.han,sC,aHC,aAC,labels),
     };
   }
-
   global.Boligkalkulator = { beregnAlt: beregnAlt };
 })(typeof window !== 'undefined' ? window : globalThis);
 </script>
@@ -1065,6 +1047,8 @@ let state = {
   salgspris: 4500000,
   salgskostnad_pst: 0.02,
   modell_b_eierandel_hun: 0.50,
+  ekstra_innbetaling_mnd: 2000,
+  modell_c_metode: 1,
 };
 let activeModel = 'both';
 let debounceTimer = null;
@@ -1137,6 +1121,7 @@ function handleSlider(key, rawVal) {
   if (key === 'rente')       { state.rente_arlig = v/100;      setLbl('lbl-rente', v.toFixed(1)+' %'); }
   if (key === 'nedbetaling') { state.nedbetalingstid_ar = v;   setLbl('lbl-nedbetaling', v+' år'); }
   if (key === 'andel')       { state.modell_b_eierandel_hun = v/100; setLbl('lbl-andel', v.toFixed(0)+' %'); }
+  if (key === 'ekstra')      { state.ekstra_innbetaling_mnd = v; setLbl('lbl-ekstra', fmtKr(v)); }
   debouncedFetch();
 }
 function setLbl(id, txt) { const e=document.getElementById(id); if(e) e.textContent = txt; }
@@ -1153,6 +1138,15 @@ function attachModelButtons() {
   document.querySelectorAll('.model-btn[data-model]').forEach(btn => {
     btn.addEventListener('click', () => setModel(btn.dataset.model));
   });
+  document.querySelectorAll('.model-btn[data-cmetode]').forEach(btn => {
+    btn.addEventListener('click', () => setCMetode(parseInt(btn.dataset.cmetode, 10)));
+  });
+}
+function setCMetode(metode) {
+  state.modell_c_metode = metode;
+  document.getElementById('btn-cm1').className = 'model-btn' + (metode===1 ? ' active-c' : '');
+  document.getElementById('btn-cm2').className = 'model-btn' + (metode===2 ? ' active-c' : '');
+  debouncedFetch();
 }
 function setModel(m) {
   activeModel = m;
@@ -1213,6 +1207,7 @@ function fetchData() {
       rente_arlig: state.rente_arlig, nedbetalingstid_ar: state.nedbetalingstid_ar,
       salgsaar: state.salgsaar, salgspris: state.salgspris,
       salgskostnad_pst: state.salgskostnad_pst, modell_b_eierandel_hun: state.modell_b_eierandel_hun,
+      ekstra_innbetaling_mnd: state.ekstra_innbetaling_mnd, modell_c_metode: state.modell_c_metode,
     });
     render(data);
   } catch(e) { console.error('Beregning feilet', e); }
@@ -1243,6 +1238,16 @@ function render(d) {
 
   // EK-avkastning
   buildEkAvkChart(mA, mB, mC, showA, showB, showC);
+
+  // Ekstra-info: hvor lang tid å lukke gapet
+  if (inp.ek_gap > 0 && inp.ekstra_innbetaling_mnd > 0) {
+    const aar = (inp.ekstra_mnd_antall / 12);
+    setLbl('ekstra-info', `Lukker EK-gap på ${fmtKr(inp.ek_gap)} på ${inp.ekstra_mnd_antall} mnd (${aar.toFixed(1)} år). Han betaler dette ekstra til gapet er lukket.`);
+  } else if (inp.ek_gap <= 0) {
+    setLbl('ekstra-info', 'Likt EK-innskudd – ingen ekstra innbetaling nødvendig.');
+  } else {
+    setLbl('ekstra-info', 'Sett ekstra > 0 for å la han lukke EK-gapet over tid.');
+  }
 
   // Donuts (verdistigningsfordeling per modell)
   buildDonut('chart-donut-a', 'Modell A', 'Etter eierandel', COL.a.main, mA.salg);
@@ -1327,24 +1332,25 @@ function buildUtbetaling(sA, sB, sC, showA, showB, showC) {
   const cats = [];
   groups.forEach(g => { cats.push('Hun · '+g.key); cats.push('Han · '+g.key); });
 
-  const ekData = [], avdragData = [], vstignData = [];
+  const ekData = [], avdragData = [], ekstraData = [], vstignData = [];
   groups.forEach(g => {
-    ekData.push(Math.round(g.s.hun_ek_tilbake));      avdragData.push(Math.round(g.s.hun_avdrag_betalt)); vstignData.push(Math.round(g.s.hun_verdistigning));
-    ekData.push(Math.round(g.s.han_ek_tilbake));      avdragData.push(Math.round(g.s.han_avdrag_betalt)); vstignData.push(Math.round(g.s.han_verdistigning));
+    ekData.push(Math.round(g.s.hun_ek_tilbake)); avdragData.push(Math.round(g.s.hun_avdrag_betalt)); ekstraData.push(Math.round(g.s.hun_ekstra_betalt)); vstignData.push(Math.round(g.s.hun_verdistigning));
+    ekData.push(Math.round(g.s.han_ek_tilbake)); avdragData.push(Math.round(g.s.han_avdrag_betalt)); ekstraData.push(Math.round(g.s.han_ekstra_betalt)); vstignData.push(Math.round(g.s.han_verdistigning));
   });
 
   ec.setOption({
     backgroundColor:'transparent',
-    tooltip:{ trigger:'axis', axisPointer:{type:'shadow'}, backgroundColor:'#1e2530', borderColor:'#30363d', textStyle:{color:'#e6edf3',fontFamily:'DM Mono',fontSize:11}, formatter:p=>{ let s=`<b>${p[0].name}</b><br>`; let tot=0; p.forEach(i=>{ tot+=i.value; s+=`<span style="color:${i.color}">●</span> ${i.seriesName}: ${Math.round(i.value).toLocaleString('nb-NO')} kr<br>`; }); s+=`<b>Sum: ${Math.round(tot).toLocaleString('nb-NO')} kr</b>`; return s; } },
-    legend:{ data:['EK tilbake','Avdrag tilbake','Verdistigning'], textStyle:{color:'#8b949e',fontSize:11,fontFamily:'DM Mono'}, top:0 },
+    tooltip:{ trigger:'axis', axisPointer:{type:'shadow'}, backgroundColor:'#1e2530', borderColor:'#30363d', textStyle:{color:'#e6edf3',fontFamily:'DM Mono',fontSize:11}, formatter:p=>{ let s=`<b>${p[0].name}</b><br>`; let tot=0; p.forEach(i=>{ tot+=i.value; if(i.value>0.5) s+=`<span style="color:${i.color}">●</span> ${i.seriesName}: ${Math.round(i.value).toLocaleString('nb-NO')} kr<br>`; }); s+=`<b>Sum: ${Math.round(tot).toLocaleString('nb-NO')} kr</b>`; return s; } },
+    legend:{ data:['EK tilbake','Avdrag tilbake','Ekstra innbetalt','Verdistigning'], textStyle:{color:'#8b949e',fontSize:11,fontFamily:'DM Mono'}, top:0 },
     grid:{ top:36, left:90, right:20, bottom:40 },
     xAxis:{ type:'category', data:cats, axisLine:{lineStyle:{color:'#30363d'}}, axisLabel:{color:'#e6edf3',fontFamily:'DM Mono',fontSize:11,rotate:cats.length>4?20:0} },
     yAxis:{ type:'value', axisLine:{show:false}, axisTick:{show:false}, splitLine:{lineStyle:{color:'#21262d'}}, axisLabel:{color:'#8b949e',fontFamily:'DM Mono',fontSize:10, formatter:krShort} },
     series:[
       { name:'EK tilbake',     type:'bar', stack:'t', data:ekData,     itemStyle:{color:'#5a6472'}, barMaxWidth:46 },
       { name:'Avdrag tilbake', type:'bar', stack:'t', data:avdragData, itemStyle:{color:'#2e7d8c'} },
+      { name:'Ekstra innbetalt', type:'bar', stack:'t', data:ekstraData, itemStyle:{color:'#bc8cff'} },
       { name:'Verdistigning',  type:'bar', stack:'t', data:vstignData, itemStyle:{color:'#3fb950'},
-        label:{show:true,position:'top',formatter:p=>krShort(ekData[p.dataIndex]+avdragData[p.dataIndex]+vstignData[p.dataIndex]),color:'#e6edf3',fontFamily:'DM Mono',fontSize:10} },
+        label:{show:true,position:'top',formatter:p=>krShort(ekData[p.dataIndex]+avdragData[p.dataIndex]+ekstraData[p.dataIndex]+vstignData[p.dataIndex]),color:'#e6edf3',fontFamily:'DM Mono',fontSize:10} },
     ],
   });
 }
@@ -1428,12 +1434,14 @@ function buildSettlementTable(tbodyId, s) {
     { label:'Hun – får totalt', val:fmtKr(s.hun_totalt), cls:'row-total' },
     { label:'  ↳ EK tilbake', val:fmtKr(s.hun_ek_tilbake), cls:'row-gevinst' },
     { label:'  ↳ Egne avdrag', val:fmtKr(s.hun_avdrag_betalt), cls:'row-gevinst' },
-    { label:`  ↳ Verdistigning (${fmtPct(s.hun_andel)})`, val:fmtKr(s.hun_verdistigning), cls:'row-gevinst' },
-    { label:'Han – får totalt', val:fmtKr(s.han_totalt), cls:'row-total' },
-    { label:'  ↳ EK tilbake', val:fmtKr(s.han_ek_tilbake), cls:'row-gevinst' },
-    { label:'  ↳ Egne avdrag', val:fmtKr(s.han_avdrag_betalt), cls:'row-gevinst' },
-    { label:`  ↳ Verdistigning (${fmtPct(s.han_andel)})`, val:fmtKr(s.han_verdistigning), cls:'row-gevinst' },
   ];
+  if (s.hun_ekstra_betalt > 0.5) rows.push({ label:'  ↳ Ekstra innbetalt', val:fmtKr(s.hun_ekstra_betalt), cls:'row-gevinst' });
+  rows.push({ label:`  ↳ Verdistigning (${fmtPct(s.hun_andel)})`, val:fmtKr(s.hun_verdistigning), cls:'row-gevinst' });
+  rows.push({ label:'Han – får totalt', val:fmtKr(s.han_totalt), cls:'row-total' });
+  rows.push({ label:'  ↳ EK tilbake', val:fmtKr(s.han_ek_tilbake), cls:'row-gevinst' });
+  rows.push({ label:'  ↳ Egne avdrag', val:fmtKr(s.han_avdrag_betalt), cls:'row-gevinst' });
+  if (s.han_ekstra_betalt > 0.5) rows.push({ label:'  ↳ Ekstra innbetalt', val:fmtKr(s.han_ekstra_betalt), cls:'row-gevinst' });
+  rows.push({ label:`  ↳ Verdistigning (${fmtPct(s.han_andel)})`, val:fmtKr(s.han_verdistigning), cls:'row-gevinst' });
   tbody.innerHTML = '';
   rows.forEach(r => {
     const tr = document.createElement('tr');
